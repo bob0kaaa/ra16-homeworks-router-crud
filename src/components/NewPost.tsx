@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const API = 'http://localhost:7070/posts'
+import { API } from '../api'
 
 function NewPost() {
   const [content, setContent] = useState('')

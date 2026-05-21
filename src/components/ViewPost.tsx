@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-
-const API = 'http://localhost:7070/posts'
+import { API } from '../api'
 
 interface Post {
   id: number
   content: string
+  created?: number
 }
 
 function ViewPost() {
@@ -18,12 +18,14 @@ function ViewPost() {
   useEffect(() => {
     fetch(`${API}/${id}`)
       .then(r => r.json())
-      .then((data: Post) => { setPost(data); setContent(data.content) })
+      .then((data: { post: Post }) => { setPost(data.post); setContent(data.post.content) })
+      .catch(err => { console.error(err) })
   }, [id])
 
   const handleDelete = (): void => {
     fetch(`${API}/${id}`, { method: 'DELETE' })
       .then(() => navigate('/'))
+      .catch(err => { console.error(err) })
   }
 
   const handleSave = (): void => {
@@ -31,10 +33,10 @@ function ViewPost() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: Number(id), content }),
-    }).then(r => r.json()).then((updated: Post) => {
-      setPost(updated)
+    }).then(() => {
+      setPost(prev => prev ? { ...prev, content } : prev)
       setEditing(false)
-    })
+    }).catch(err => { console.error(err) })
   }
 
   if (!post) return <p className="loading">Загрузка...</p>
